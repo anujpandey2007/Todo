@@ -178,7 +178,7 @@
             font-weight: 600;
         }
 
-        input[type="text"], textarea {
+        input[type="text"], input[type="password"], textarea {
             background: #ffffff;
             border: 1px solid var(--card-border);
             border-radius: 6px;
@@ -191,7 +191,7 @@
             font-size: 0.95rem;
         }
 
-        input[type="text"]:focus, textarea:focus {
+        input[type="text"]:focus, input[type="password"]:focus, textarea:focus {
             border-color: var(--card-border-focus);
         }
 
@@ -626,6 +626,15 @@
         <!-- Header -->
         <header>
             <div class="logo-section">
+                <!-- Profile Widget at the Left Corner -->
+                <div id="profileWidget" style="display: none; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; font-size: 0.85rem;">
+                    <span style="font-weight: 600; color: var(--text-main); display: inline-flex; align-items: center; gap: 0.25rem;">
+                        👤 <span id="currentUsername"></span>
+                    </span>
+                    <button type="button" onclick="openProfileModal()" style="background: none; border: none; color: var(--text-muted); cursor: pointer; text-decoration: underline; font-family: inherit; font-size: 0.8rem;">Edit Profile</button>
+                    <span style="color: var(--card-border);">|</span>
+                    <button type="button" onclick="logout()" style="background: none; border: none; color: var(--danger); cursor: pointer; text-decoration: underline; font-family: inherit; font-size: 0.8rem;">Logout</button>
+                </div>
                 <div class="logo-text">
                     <h1>Todo</h1>
                     <p>Manage your daily goals</p>
@@ -644,61 +653,102 @@
             </div>
         </header>
 
-        <!-- Stats Grid Dashboard -->
-        <section class="stats-grid">
-            <div class="stat-card total">
-                <span class="stat-label">Total tasks</span>
-                <span id="statsTotal" class="stat-value">0</span>
+        <!-- Login/Signup Card -->
+        <section id="authCard" class="glass-card" style="display: block; max-width: 450px; margin: 1.5rem auto; width: 100%;">
+            <div style="display: flex; border-bottom: 1px solid var(--card-border); margin-bottom: 1.5rem;">
+                <button id="tabLogin" class="filter-tab active" style="flex: 1; padding: 0.75rem; border-radius: 0; font-size: 1rem; border-bottom: 2px solid var(--text-main);" onclick="switchAuthTab('login')">Login</button>
+                <button id="tabSignup" class="filter-tab" style="flex: 1; padding: 0.75rem; border-radius: 0; font-size: 1rem; border-bottom: 2px solid transparent;" onclick="switchAuthTab('signup')">Sign Up</button>
             </div>
-            <div class="stat-card pending">
-                <span class="stat-label">Pending</span>
-                <span id="statsPending" class="stat-value">0</span>
-            </div>
-            <div class="stat-card completed">
-                <span class="stat-label">Completed</span>
-                <span id="statsCompleted" class="stat-value">0</span>
-            </div>
-        </section>
-
-        <!-- Form: Add Task -->
-        <section class="glass-card">
-            <form id="taskForm">
-                <div class="input-group">
-                    <div class="form-row">
-                        <div class="field-container">
-                            <label for="taskTitle">Task Title *</label>
-                            <input type="text" id="taskTitle" placeholder="What needs to be done?" required>
-                        </div>
-                        <div class="field-container">
-                            <label for="taskDesc">Description (Optional)</label>
-                            <input type="text" id="taskDesc" placeholder="Add context...">
-                        </div>
-                    </div>
-                    <div style="display: flex; justify-content: flex-end;">
-                        <button type="submit" class="btn-primary">
-                            Add Task
-                        </button>
-                    </div>
+            
+            <!-- Login Form -->
+            <form id="loginForm" style="display: flex; flex-direction: column; gap: 1.25rem;">
+                <div class="field-container">
+                    <label for="loginUsername">Username</label>
+                    <input type="text" id="loginUsername" placeholder="Enter your username" required>
                 </div>
+                <div class="field-container">
+                    <label for="loginPassword">Password</label>
+                    <input type="password" id="loginPassword" placeholder="Enter your password" required>
+                </div>
+                <button type="submit" class="btn-primary" style="width: 100%; padding: 0.85rem; justify-content: center;">Login</button>
+            </form>
+
+            <!-- Signup Form -->
+            <form id="signupForm" style="display: none; flex-direction: column; gap: 1.25rem;">
+                <div class="field-container">
+                    <label for="signupUsername">Username</label>
+                    <input type="text" id="signupUsername" placeholder="Choose a username" required>
+                </div>
+                <div class="field-container">
+                    <label for="signupPassword">Password</label>
+                    <input type="password" id="signupPassword" placeholder="Choose a password (min. 4 characters)" required>
+                </div>
+                <div class="field-container">
+                    <label for="signupConfirmPassword">Confirm Password</label>
+                    <input type="password" id="signupConfirmPassword" placeholder="Confirm your password" required>
+                </div>
+                <button type="submit" class="btn-primary" style="width: 100%; padding: 0.85rem; justify-content: center;">Sign Up</button>
             </form>
         </section>
 
-        <!-- Filters and Search Controls -->
-        <section class="control-row">
-            <div class="filter-tabs">
-                <button class="filter-tab active" onclick="setFilter('all')">All</button>
-                <button class="filter-tab" onclick="setFilter('pending')">Pending</button>
-                <button class="filter-tab" onclick="setFilter('completed')">Completed</button>
-            </div>
-            <div class="search-container">
-                <input type="text" class="search-input" id="searchInput" placeholder="Search tasks..." oninput="handleSearch()">
-            </div>
-        </section>
+        <!-- Main Dashboard Section -->
+        <main id="mainDashboard" style="display: none; flex-direction: column; gap: 1.25rem;">
+            <!-- Stats Grid Dashboard -->
+            <section class="stats-grid">
+                <div class="stat-card total">
+                    <span class="stat-label">Total tasks</span>
+                    <span id="statsTotal" class="stat-value">0</span>
+                </div>
+                <div class="stat-card pending">
+                    <span class="stat-label">Pending</span>
+                    <span id="statsPending" class="stat-value">0</span>
+                </div>
+                <div class="stat-card completed">
+                    <span class="stat-label">Completed</span>
+                    <span id="statsCompleted" class="stat-value">0</span>
+                </div>
+            </section>
 
-        <!-- Task List Container -->
-        <section id="taskList" class="tasks-container">
-            <!-- Spinner / Tasks rendered dynamically -->
-        </section>
+            <!-- Form: Add Task -->
+            <section class="glass-card">
+                <form id="taskForm">
+                    <div class="input-group">
+                        <div class="form-row">
+                            <div class="field-container">
+                                <label for="taskTitle">Task Title *</label>
+                                <input type="text" id="taskTitle" placeholder="What needs to be done?" required>
+                            </div>
+                            <div class="field-container">
+                                <label for="taskDesc">Description (Optional)</label>
+                                <input type="text" id="taskDesc" placeholder="Add context...">
+                            </div>
+                        </div>
+                        <div style="display: flex; justify-content: flex-end;">
+                            <button type="submit" class="btn-primary">
+                                Add Task
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </section>
+
+            <!-- Filters and Search Controls -->
+            <section class="control-row">
+                <div class="filter-tabs">
+                    <button class="filter-tab active" onclick="setFilter('all')">All</button>
+                    <button class="filter-tab" onclick="setFilter('pending')">Pending</button>
+                    <button class="filter-tab" onclick="setFilter('completed')">Completed</button>
+                </div>
+                <div class="search-container">
+                    <input type="text" class="search-input" id="searchInput" placeholder="Search tasks..." oninput="handleSearch()">
+                </div>
+            </section>
+
+            <!-- Task List Container -->
+            <section id="taskList" class="tasks-container">
+                <!-- Spinner / Tasks rendered dynamically -->
+            </section>
+        </main>
 
         <!-- Footer -->
         <footer class="app-footer">
@@ -712,7 +762,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h3>Edit Task</h3>
-                <button class="btn-icon" onclick="closeEditModal()">
+                <button class="btn-icon" type="button" onclick="closeEditModal()">
                     <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
                 </button>
             </div>
@@ -738,6 +788,34 @@
         </div>
     </div>
 
+    <!-- Profile Modal -->
+    <div id="profileModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Update Profile</h3>
+                <button class="btn-icon" type="button" onclick="closeProfileModal()">
+                    <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+                </button>
+            </div>
+            <form id="profileForm">
+                <div class="input-group">
+                    <div class="field-container">
+                        <label for="profileEditUsername">Username</label>
+                        <input type="text" id="profileEditUsername" required>
+                    </div>
+                    <div class="field-container">
+                        <label for="profileEditPassword">New Password</label>
+                        <input type="password" id="profileEditPassword" required placeholder="Enter new password">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn-secondary" onclick="closeProfileModal()">Cancel</button>
+                        <button type="submit" class="btn-primary">Save Changes</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Notification Toast Container -->
     <div id="toastContainer" class="toast-container"></div>
 
@@ -750,6 +828,10 @@
             filter: 'all',
             searchQuery: ''
         };
+
+        let token = localStorage.getItem('todo_token') || null;
+        let userId = null;
+        let username = localStorage.getItem('todo_username') || null;
 
         const DOM = {
             statusBadge: document.getElementById('statusBadge'),
@@ -776,7 +858,7 @@
 
         // Initialize App
         document.addEventListener('DOMContentLoaded', () => {
-            fetchTasks();
+            initSession();
 
             // Submit Handler for Creating Tasks
             DOM.taskForm.addEventListener('submit', async (e) => {
@@ -792,7 +874,10 @@
                 try {
                     const response = await fetch(API_BASE, {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
+                        headers: { 
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
                         body: JSON.stringify({ title, description, completed: false })
                     });
 
@@ -827,7 +912,10 @@
                 try {
                     const response = await fetch(`${API_BASE}/${id}`, {
                         method: 'PUT',
-                        headers: { 'Content-Type': 'application/json' },
+                        headers: { 
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
                         body: JSON.stringify({ title, description, completed })
                     });
 
@@ -848,11 +936,232 @@
             });
         });
 
+        // Session and Auth Handling
+        function initSession() {
+            token = localStorage.getItem('todo_token');
+            if (token) {
+                checkAuthAndLoad();
+            } else {
+                showAuthState(false);
+                // Also check server availability
+                checkServerStatus();
+            }
+        }
+
+        async function checkServerStatus() {
+            try {
+                // Check if backend responds
+                const response = await fetch('/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
+                setServerStatus(true);
+            } catch (error) {
+                setServerStatus(false);
+            }
+        }
+
+        function showAuthState(loggedIn) {
+            if (loggedIn) {
+                document.getElementById('mainDashboard').style.display = 'flex';
+                document.getElementById('authCard').style.display = 'none';
+                document.getElementById('profileWidget').style.display = 'flex';
+            } else {
+                document.getElementById('mainDashboard').style.display = 'none';
+                document.getElementById('authCard').style.display = 'block';
+                document.getElementById('profileWidget').style.display = 'none';
+            }
+        }
+
+        async function checkAuthAndLoad() {
+            try {
+                const response = await fetch('/register/me', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (response.ok) {
+                    const user = await response.json();
+                    userId = user.id;
+                    username = user.username;
+                    document.getElementById('currentUsername').textContent = username;
+                    showAuthState(true);
+                    setServerStatus(true);
+                    fetchTasks();
+                } else {
+                    logout();
+                }
+            } catch (error) {
+                setServerStatus(false);
+                logout();
+                showToast('Session expired or server connection failed.', 'error');
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('todo_token');
+            localStorage.removeItem('todo_username');
+            token = null;
+            userId = null;
+            username = null;
+            showAuthState(false);
+        }
+
+        // Switch Auth Tab
+        function switchAuthTab(tab) {
+            const tabLogin = document.getElementById('tabLogin');
+            const tabSignup = document.getElementById('tabSignup');
+            const loginForm = document.getElementById('loginForm');
+            const signupForm = document.getElementById('signupForm');
+
+            if (tab === 'login') {
+                tabLogin.classList.add('active');
+                tabLogin.style.borderBottom = '2px solid var(--text-main)';
+                tabSignup.classList.remove('active');
+                tabSignup.style.borderBottom = '2px solid transparent';
+                loginForm.style.display = 'flex';
+                signupForm.style.display = 'none';
+            } else {
+                tabSignup.classList.add('active');
+                tabSignup.style.borderBottom = '2px solid var(--text-main)';
+                tabLogin.classList.remove('active');
+                tabLogin.style.borderBottom = '2px solid transparent';
+                loginForm.style.display = 'none';
+                signupForm.style.display = 'flex';
+            }
+        }
+
+        // Handle Login Submission
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const usernameInput = document.getElementById('loginUsername').value.trim();
+            const passwordInput = document.getElementById('loginPassword').value;
+
+            try {
+                const response = await fetch('/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: usernameInput, password: passwordInput })
+                });
+
+                if (response.ok) {
+                    const tokenText = await response.text();
+                    if (tokenText === 'failure') {
+                        showToast('Invalid username or password', 'error');
+                    } else {
+                        localStorage.setItem('todo_token', tokenText);
+                        localStorage.setItem('todo_username', usernameInput);
+                        token = tokenText;
+                        showToast('Logged in successfully!', 'success');
+                        checkAuthAndLoad();
+                    }
+                } else {
+                    showToast('Login failed. Please check your credentials.', 'error');
+                }
+            } catch (error) {
+                showToast('Network error during login.', 'error');
+            }
+        });
+
+        // Handle Signup Submission
+        document.getElementById('signupForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const usernameInput = document.getElementById('signupUsername').value.trim();
+            const passwordInput = document.getElementById('signupPassword').value;
+            const confirmPasswordInput = document.getElementById('signupConfirmPassword').value;
+
+            if (passwordInput.length < 4) {
+                showToast('Password must be at least 4 characters long', 'error');
+                return;
+            }
+
+            if (passwordInput !== confirmPasswordInput) {
+                showToast('Passwords do not match', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch('/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: usernameInput, password: passwordInput })
+                });
+
+                if (response.status === 201) {
+                    showToast('Registration successful! Logging you in...', 'success');
+                    // Auto Login
+                    const loginResponse = await fetch('/login', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ username: usernameInput, password: passwordInput })
+                    });
+                    if (loginResponse.ok) {
+                        const tokenText = await loginResponse.text();
+                        if (tokenText !== 'failure') {
+                            localStorage.setItem('todo_token', tokenText);
+                            localStorage.setItem('todo_username', usernameInput);
+                            token = tokenText;
+                            checkAuthAndLoad();
+                        }
+                    }
+                } else {
+                    showToast('Registration failed. Username may already exist.', 'error');
+                }
+            } catch (error) {
+                showToast('Network error during registration.', 'error');
+            }
+        });
+
+        // Profile Modal Logic
+        function openProfileModal() {
+            document.getElementById('profileEditUsername').value = username;
+            document.getElementById('profileEditPassword').value = '';
+            document.getElementById('profileModal').classList.add('active');
+        }
+
+        function closeProfileModal() {
+            document.getElementById('profileModal').classList.remove('active');
+            document.getElementById('profileForm').reset();
+        }
+
+        document.getElementById('profileForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const newUsername = document.getElementById('profileEditUsername').value.trim();
+            const newPassword = document.getElementById('profileEditPassword').value;
+
+            if (newUsername.length < 3) {
+                showToast('Username must be at least 3 characters long', 'error');
+                return;
+            }
+            if (newPassword.length < 4) {
+                showToast('Password must be at least 4 characters long', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch(`/register/update/${userId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ username: newUsername, password: newPassword })
+                });
+
+                if (response.ok) {
+                    showToast('Profile updated successfully! Logging out to apply changes...', 'success');
+                    closeProfileModal();
+                    setTimeout(() => logout(), 1500);
+                } else {
+                    showToast('Failed to update profile.', 'error');
+                }
+            } catch (error) {
+                showToast('Network error while updating profile.', 'error');
+            }
+        });
+
         // API Fetch Tasks
         async function fetchTasks() {
             showLoading(true);
             try {
-                const response = await fetch(API_BASE);
+                const response = await fetch(API_BASE, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
                 if (response.ok) {
                     state.tasks = await response.json();
                     setServerStatus(true);
@@ -879,7 +1188,10 @@
             try {
                 const response = await fetch(`${API_BASE}/${id}`, {
                     method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
                     body: JSON.stringify({
                         title: task.title,
                         description: task.description,
@@ -906,7 +1218,8 @@
 
             try {
                 const response = await fetch(`${API_BASE}/${id}`, {
-                    method: 'DELETE'
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
                 });
 
                 if (response.ok) {
@@ -1069,7 +1382,6 @@
         }
 
         // Helper to format Java LocalDates nicely
-        // Date format handles both YYYY-MM-DD or standard Date string formats
         function formatDate(dateString) {
             if (!dateString) return '';
             const date = new Date(dateString);
@@ -1077,7 +1389,6 @@
         }
 
         // Prevent XSS Injection helper
-        // Used to sanitize database outputs
         function escapeHtml(text) {
             const map = {
                 '&': '&amp;',
